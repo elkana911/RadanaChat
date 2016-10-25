@@ -1,6 +1,7 @@
 package id.co.ppu.radanachat.rest;
 
 import id.co.ppu.radanachat.rest.request.RequestChatBetween;
+import id.co.ppu.radanachat.rest.response.ResponseChatContacts;
 import id.co.ppu.radanachat.rest.response.ResponseChatHistory;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -13,6 +14,9 @@ import retrofit2.http.Query;
  * Created by Eric on 19-Aug-16.
  */
 public interface ApiInterface {
+    @GET("fast/chat_hist")
+    Call<ResponseChatContacts> getChatContacts(@Query("collCode") String collCode);
+
     @GET("fast/chat_hist")
     Call<ResponseChatHistory> getChatHistory(@Query("collCode") String collCode);
 
