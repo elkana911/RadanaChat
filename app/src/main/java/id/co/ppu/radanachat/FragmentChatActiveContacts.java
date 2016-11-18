@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,12 +17,10 @@ import android.widget.TextView;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import co.moonmonkeylabs.realmsearchview.RealmSearchAdapter;
 import co.moonmonkeylabs.realmsearchview.RealmSearchViewHolder;
 import id.co.ppu.radanachat.components.DividerItemDecoration;
 import id.co.ppu.radanachat.components.RealmSearchView;
-import id.co.ppu.radanachat.listener.OnContactsListener;
 import id.co.ppu.radanachat.pojo.chats.TrnChatContact;
 import id.co.ppu.radanachat.pojo.chats.TrnChatLog;
 import id.co.ppu.radanachat.util.Utility;
@@ -33,27 +30,28 @@ import io.realm.RealmResults;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class FragmentChatActiveContacts extends Fragment {
     private Realm realm;
 
     @BindView(R.id.contacts)
     RealmSearchView contacts;
 
-    @BindView(R.id.fab)
-    FloatingActionButton fab;
+    @BindView(R.id.tvSeparator)
+    TextView tvSeparator;
 
-    private OnContactsListener mListener;
+    private OnContactsListener caller;
 
     private ContactListAdapter mAdapter;
 
-    public MainActivityFragment() {
+    public FragmentChatActiveContacts() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        View view = inflater.inflate(R.layout.fragment_chat_contacts, container, false);
         ButterKnife.bind(this, view);
+
         contacts.getRealmRecyclerView().addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
 
         return view;
@@ -65,10 +63,38 @@ public class MainActivityFragment extends Fragment {
 
         this.realm = Realm.getDefaultInstance();
 
-        loadRecentContacts();
+        loadRecentContactsFromServer();
+
+        if (caller != null) {
+            caller.onStatusOnline();
+        }
     }
 
-    private void loadRecentContacts() {
+    private void buildDummyActiveContacts() {
+
+        this.realm.executeTransaction(new Realm.Transaction() {
+            @Override
+            public void execute(Realm realm) {
+                realm.where(TrnChatContact.class)
+                        .equalTo("contactType", "BOT")
+                        .findAll().deleteAllFromRealm();
+
+                for (int i = 0; i < 10; i++) {
+
+                    TrnChatContact newContact = realm.createObject(TrnChatContact.class);
+
+                    newContact.setUid(Utility.generateUUID());
+                    newContact.setCollCode("1234" + i);
+                    newContact.setNickName("BOT #" + (i+1));
+                    newContact.setContactType("BOT");
+
+                    realm.copyToRealm(newContact);
+                }
+            }
+        });
+    }
+
+    private void loadRecentContactsFromServer() {
         contacts.setAdapter(null);
 
         RealmResults<TrnChatContact> contacts = this.realm.where(TrnChatContact.class)
@@ -76,6 +102,8 @@ public class MainActivityFragment extends Fragment {
 
         if (contacts.size() < 1) {
             // sementara create dummy ?
+            buildDummyActiveContacts();
+
             RealmResults<TrnChatLog> chatLogs = this.realm.where(TrnChatLog.class)
                     .findAll();
 
@@ -91,10 +119,10 @@ public class MainActivityFragment extends Fragment {
             }
         });
 
-        long count = this.realm.where(TrnChatLog.class)
-                .count();
+//        long count = this.realm.where(TrnChatLog.class)
+//                .count();
 
-        if (count < 1) {
+        if (contacts.size() < 1) {
             this.contacts.setVisibility(View.INVISIBLE);
         } else {
             this.contacts.setVisibility(View.VISIBLE);
@@ -128,7 +156,7 @@ public class MainActivityFragment extends Fragment {
         super.onAttach(context);
 
         if (context instanceof OnContactsListener) {
-            mListener = (OnContactsListener) context;
+            caller = (OnContactsListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnContactsListener");
@@ -138,17 +166,13 @@ public class MainActivityFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        caller = null;
     }
+
+
 
     public void search(String query) {
         contacts.getSearchBar().setText(query);
-    }
-
-
-    @OnClick(R.id.fab)
-    public void onClickFab() {
-
     }
 
     public class ContactListAdapter extends RealmSearchAdapter<TrnChatContact, ContactListAdapter.DataViewHolder> {
@@ -170,7 +194,7 @@ public class MainActivityFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     if (getContext() instanceof OnContactsListener) {
-                        ((OnContactsListener)getContext()).onContactSelected();
+                        ((OnContactsListener)getContext()).onContactSelected(detail);
                     }
 
                 }
@@ -204,6 +228,12 @@ public class MainActivityFragment extends Fragment {
             }
 
         }
+    }
+
+    public interface OnContactsListener {
+        void onContactSelected(TrnChatContact contact);
+        void onContactClearChats(TrnChatContact contact);
+        void onStatusOnline();
     }
 
 }

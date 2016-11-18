@@ -10,7 +10,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical"
-    tools:context="id.co.ppu.radanachat.MainActivityFragment"
+    tools:context="id.co.ppu.radanachat.FragmentChatActiveContacts"
     tools:showIn="@layout/activity_main">
 
     <TextView
@@ -19,32 +19,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="8dp"
-        android:text="No Contracts" />
+        android:text="No Contacts" />
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="@dimen/activity_horizontal_margin"
-        android:paddingEnd="@dimen/fab_margin"
-        android:paddingBottom="@dimen/fab_margin"
-        >
 
         <id.co.ppu.radanachat.components.RealmSearchView
             android:id="@+id/contacts"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             app:rsvHint="@string/search_hint" />
-
-        <android.support.design.widget.FloatingActionButton
-
-            android:id="@+id/fab"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:tint="@android:color/white"
-            app:srcCompat="@drawable/ic_edit_black_24dp" />
-
-    </RelativeLayout>
 
 </LinearLayout>

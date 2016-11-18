@@ -1,6 +1,7 @@
 package id.co.ppu.radanachat.rest;
 
 import id.co.ppu.radanachat.rest.request.RequestChatBetween;
+import id.co.ppu.radanachat.rest.request.RequestChatStatus;
 import id.co.ppu.radanachat.rest.response.ResponseChatContacts;
 import id.co.ppu.radanachat.rest.response.ResponseChatHistory;
 import okhttp3.ResponseBody;
@@ -14,7 +15,15 @@ import retrofit2.http.Query;
  * Created by Eric on 19-Aug-16.
  */
 public interface ApiInterface {
-    @GET("fast/chat_hist")
+
+    @GET("fastchat/send")
+    Call<ResponseBody> sendMessage(@Query("msg") String msg);
+
+    @POST("fastchat/status")
+    Call<ResponseBody> sendStatus(@Body RequestChatStatus status);
+
+
+    @GET("fast/chat_contacts")
     Call<ResponseChatContacts> getChatContacts(@Query("collCode") String collCode);
 
     @GET("fast/chat_hist")
@@ -26,9 +35,8 @@ public interface ApiInterface {
 //    @POST("fast/chat_last")
 //    Call<ResponseChatLast> getChatLast(@Body RequestChatLast request);
 
-    @GET("fast/chat_status")
+    @GET("fast/chat_hist")
     Call<ResponseBody> setChatHistory(@Query("uid") String uid);
 
-    @GET("fast/chat_send")
-    Call<ResponseBody> sendMessage(@Query("msg") String msg);
+
 }

@@ -27,6 +27,12 @@ public class TrnChatContact extends RealmObject implements Serializable {
     @SerializedName("photoUrl")
     private String photoUrl;
 
+    /**
+     * BOT, HUMAN
+     */
+    @SerializedName("contactType")
+    private String contactType;
+
     public String getUid() {
         return uid;
     }
@@ -59,6 +65,14 @@ public class TrnChatContact extends RealmObject implements Serializable {
         this.photoUrl = photoUrl;
     }
 
+    public String getContactType() {
+        return contactType;
+    }
+
+    public void setContactType(String contactType) {
+        this.contactType = contactType;
+    }
+
     @Override
     public String toString() {
         return "TrnChatContact{" +
@@ -66,6 +80,7 @@ public class TrnChatContact extends RealmObject implements Serializable {
                 ", nickName='" + nickName + '\'' +
                 ", collCode='" + collCode + '\'' +
                 ", photoUrl='" + photoUrl + '\'' +
+                ", contactType='" + contactType + '\'' +
                 '}';
     }
 }
